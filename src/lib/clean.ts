@@ -66,8 +66,14 @@ function normalize(root: HTMLElement) {
   root.querySelectorAll('font').forEach(unwrap);
 
   root.querySelectorAll('p').forEach((p) => {
-    if (!/MsoListParagraph/i.test(p.getAttribute('class') || '') && !/mso-list:/i.test(p.getAttribute('style') || '')) return;
+    const style = p.getAttribute('style') || '';
+    if (!/MsoListParagraph/i.test(p.getAttribute('class') || '') && !/mso-list:/i.test(style)) return;
     const li = p.ownerDocument.createElement('li');
+    const levelMatch = style.match(/mso-list:[^;]*level(\d+)/i);
+    const margin = parseFloat((p as HTMLElement).style.marginLeft || '0');
+    const unit = ((p as HTMLElement).style.marginLeft || '').replace(/[\d.\-]/g, '');
+    const marginIn = unit === 'in' ? margin : unit === 'pt' ? margin / 72 : unit === 'px' ? margin / 96 : unit === 'cm' ? margin / 2.54 : 0;
+    li.dataset.level = String(levelMatch ? Number(levelMatch[1]) : Math.max(1, Math.round(marginIn * 2)));
     while (p.firstChild) li.appendChild(p.firstChild);
     p.replaceWith(li);
     li.querySelectorAll('[style*="mso-list:Ignore"], [style*="mso-list: Ignore"]').forEach((n) => n.remove());
@@ -76,17 +82,38 @@ function normalize(root: HTMLElement) {
       if (/symbol|wingdings|courier new|times new roman/i.test(ff) && /^[\s\u00a0·•o§●■\-\d.)a-z]*$/i.test(sp.textContent || '')) sp.remove();
     });
     const first = li.ownerDocument.createTreeWalker(li, 4).nextNode();
-    if (first) first.textContent = first.textContent!.replace(/^[\s\u00a0]*(?:[·•o§●■\-]|\d+[.)]|[a-zA-Z][.)])?[\s\u00a0]*/, '');
+    if (first) {
+      const m = first.textContent!.match(/^[\s\u00a0]*(?:([·•o§●■\-])|(\d+[.)]|[a-zA-Z][.)]))?[\s\u00a0]*/);
+      if (m && m[2]) li.dataset.ordered = '1';
+      first.textContent = first.textContent!.replace(/^[\s\u00a0]*(?:[·•o§●■\-]|\d+[.)]|[a-zA-Z][.)])?[\s\u00a0]*/, '');
+    }
   });
   const parents = new Set<Node>();
-  root.querySelectorAll('li').forEach((li) => { if (li.parentElement && !['UL', 'OL'].includes(li.parentElement.tagName)) parents.add(li.parentElement); });
+  root.querySelectorAll('li[data-level]').forEach((li) => { if (li.parentElement && !['UL', 'OL'].includes(li.parentElement.tagName)) parents.add(li.parentElement); });
   parents.forEach((parent) => {
     let run: HTMLLIElement[] = [];
     const flush = () => {
       if (run.length === 0) return;
-      const ul = run[0].ownerDocument.createElement('ul');
-      run[0].before(ul);
-      run.forEach((li) => ul.appendChild(li));
+      const doc = run[0].ownerDocument;
+      const anchor = doc.createComment('');
+      run[0].before(anchor);
+      const stack: { list: HTMLElement; level: number }[] = [];
+      run.forEach((li) => {
+        const level = Number(li.dataset.level);
+        const tag = li.dataset.ordered ? 'ol' : 'ul';
+        while (stack.length && (stack[stack.length - 1].level > level || (stack[stack.length - 1].level === level && stack[stack.length - 1].list.tagName.toLowerCase() !== tag))) stack.pop();
+        if (!stack.length || stack[stack.length - 1].level < level) {
+          const list = doc.createElement(tag);
+          if (!stack.length) anchor.before(list);
+          else {
+            const parentLi = stack[stack.length - 1].list.lastElementChild || stack[stack.length - 1].list;
+            parentLi.appendChild(list);
+          }
+          stack.push({ list, level });
+        }
+        stack[stack.length - 1].list.appendChild(li);
+      });
+      anchor.remove();
       run = [];
     };
     Array.from(parent.childNodes).forEach((n) => {
@@ -222,7 +249,7 @@ export function clean(rawHtml: string, rawText: string): CleanResult {
   wrapLooseText(root);
   const html = root.innerHTML.replace(/ /g, ' ').replace(/>\s+</g, '><').trim();
   const text = toText(root);
-  const markdown = turndown.turndown(html).replace(/^(\s*)([-*]|\d+\.)[ \t]{2,}/gm, '$1$2 ').trim();
+  const markdown = turndown.turndown(html).replace(/^( *)([-*]|\d+\.)[ \t]{2,}/gm, (_m, sp: string, mk: string) => ' '.repeat(sp.length / 2) + mk + ' ').trim();
   return { html, text, markdown, stats: { ...stats, chars: text.length } };
 }
 

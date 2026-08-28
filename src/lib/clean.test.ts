@@ -13,7 +13,21 @@ const onenote = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns="
 
 const gdocs = `<meta charset='utf-8'><b style="font-weight:normal;" id="docs-internal-guid-abc"><p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span style="font-size:11pt;font-family:Arial;color:#000000;font-weight:700;">Bold title</span></p><p dir="ltr" style="line-height:1.38;"><span style="font-size:11pt;font-family:Arial;font-style:italic;">Italic body</span></p><ul style="margin-top:0;margin-bottom:0;"><li dir="ltr" style="list-style-type:disc;font-size:11pt;"><p dir="ltr" style="line-height:1.38;"><span style="font-size:11pt;">Item one</span></p></li></ul></b>`;
 
+const nested = `<p class=MsoListParagraph style='margin-left:.5in;mso-list:l0 level1 lfo1'><span style='font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp; </span></span>Parent</p>
+<p class=MsoListParagraph style='margin-left:1.0in;mso-list:l0 level2 lfo1'><span style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp; </span></span>Child A</p>
+<p class=MsoListParagraph style='margin-left:1.5in;mso-list:l0 level3 lfo1'><span style='font-family:Wingdings'>§<span style='font:7.0pt "Times New Roman"'>&nbsp; </span></span>Grandchild</p>
+<p class=MsoListParagraph style='margin-left:1.0in;mso-list:l0 level2 lfo1'><span style='font-family:"Courier New"'>o<span style='font:7.0pt "Times New Roman"'>&nbsp; </span></span>Child B</p>
+<p class=MsoListParagraph style='margin-left:.5in;mso-list:l1 level1 lfo2'><span style='font-family:Calibri'>1.<span style='font:7.0pt "Times New Roman"'>&nbsp; </span></span>Numbered</p>
+<p style='margin:0'>After</p>`;
+
 describe('clean', () => {
+  it('rebuilds nested and numbered Office lists', () => {
+    const r = clean(nested, '');
+    expect(r.html).toBe('<ul><li>Parent<ul><li>Child A<ul><li>Grandchild</li></ul></li><li>Child B</li></ul></li></ul><ol><li>Numbered</li></ol><p>After</p>');
+    expect(r.markdown).toBe('- Parent\n  - Child A\n    - Grandchild\n  - Child B\n\n1. Numbered\n\nAfter');
+    expect(r.text).toBe('- Parent\n  - Child A\n    - Grandchild\n  - Child B\n\n1. Numbered\n\nAfter');
+  });
+
   it('strips OneNote markup but keeps structure', () => {
     const r = clean(onenote, '');
     expect(r.html).not.toMatch(/style=|class=|<o:p|<table|Calibri/);
