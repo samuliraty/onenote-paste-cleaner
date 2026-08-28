@@ -1,5 +1,5 @@
 export const ads = {
-  publisherId: '',
+  publisherId: 'ca-pub-6920120106077389',
   slots: {
     leaderboard: '',
     inContent: '',
