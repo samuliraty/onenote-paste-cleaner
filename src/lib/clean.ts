@@ -203,10 +203,16 @@ function toText(root: HTMLElement): string {
       const idx = parent ? Array.from(parent.children).indexOf(el) + 1 : 1;
       out.push(prefix + (parent?.tagName === 'OL' ? `${idx}. ` : '- '));
       el.childNodes.forEach((c) => walk(c, prefix + '  '));
-      out.push('\n');
+      if (!out.join('').endsWith('\n')) out.push('\n');
       return;
     }
-    if (tag === 'UL' || tag === 'OL') { el.childNodes.forEach((c) => walk(c, prefix)); out.push('\n'); return; }
+    if (tag === 'UL' || tag === 'OL') {
+      const nested = el.parentElement?.tagName === 'LI';
+      if (nested && !out.join('').endsWith('\n')) out.push('\n');
+      el.childNodes.forEach((c) => walk(c, prefix));
+      if (!nested) out.push('\n');
+      return;
+    }
     if (tag === 'TR') {
       out.push(Array.from(el.children).map((c) => c.textContent!.trim()).join('\t') + '\n');
       return;
