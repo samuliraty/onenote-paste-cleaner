@@ -3,7 +3,7 @@ import { ads, adsEnabled } from '../config/ads';
 interface Props { slot: keyof typeof ads.slots; height: number; label: string; class?: string }
 const { slot, height, label, class: cls = '' } = Astro.props;
 ---
-{adsEnabled ? (
+{adsEnabled && ads.slots[slot] ? (
   <div class={`ad live ${cls}`} style={`min-height:${height}px`}>
     <ins class="adsbygoogle" style="display:block" data-ad-client={ads.publisherId} data-ad-slot={ads.slots[slot]} data-ad-format={slot === 'sidebar' ? 'vertical' : 'auto'} data-full-width-responsive="true"></ins>
     <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
