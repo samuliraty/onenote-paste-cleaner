@@ -1,0 +1,20 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  [`Which mode do I use for Jira?`, `Jira Cloud's editor accepts rich text, so use Rich. Jira Server and Data Center fields use wiki markup, so use Atlassian and paste as text.`],
+  [`Does the Atlassian mode work in Confluence?`, `Yes. Confluence shares Jira's wiki markup. In the Confluence editor use Insert → Markup, choose Confluence Wiki, and paste.`],
+  [`Why do nested lists go flat in Jira?`, `Wiki-markup fields ignore indentation. Nesting must be written as * for level one and ** for level two, which the Atlassian mode does for you.`],
+  [`Does my content get uploaded?`, `No. The cleaning runs entirely in your browser; there is no server and nothing is stored.`],
+];
+---
+<ToolPage
+  title="Paste OneNote or Word into Jira and Confluence — wiki markup converter"
+  description="Convert OneNote, Word and Google Docs content to Jira and Confluence wiki markup or clean rich text. Nested lists, bold, links and tables preserved. Free, runs in your browser."
+  h1="Paste from OneNote into Jira or Confluence. Lists stay nested."
+  lead="Paste below and pick Atlassian for Jira Server, Data Center and Confluence wiki-markup fields, or Rich for Jira Cloud. Headings, bold, links, nested lists and tables convert to the right syntax."
+  source="OneNote or Word"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">OneNote to Jira wiki markup</h2>
+  <p>Jira and Confluence wiki markup has its own syntax: <span class="mono">h2.</span> for headings, <span class="mono">*bold*</span>, <span class="mono">[text|url]</span> for links, <span class="mono">* item</span> and <span class="mono">** nested item</span> for lists, and <span class="mono">||header||</span> rows for tables. Pasting Office content into those fields either dumps raw formatting or flattens every list. The Atlassian mode rewrites the structure into that syntax so it renders correctly after you save.</p>
+</ToolPage>

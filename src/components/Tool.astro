@@ -9,25 +9,21 @@ const { source, placeholder = `Ctrl+V / ⌘V your ${source} content…` } = Astr
       <div class="paste" contenteditable="true" data-input data-ph={placeholder} aria-label="Paste area"></div>
     </div>
     <div class="card">
-      <div class="head">
-        <span class="lbl">2 · Clean result</span>
-        <div class="seg" role="tablist">
-          <button type="button" role="tab" class="on" data-mode="rich">Rich</button>
-          <button type="button" role="tab" data-mode="plain">Plain</button>
-          <button type="button" role="tab" data-mode="markdown">Markdown</button>
-          <button type="button" role="tab" data-mode="jira" title="Jira / Confluence wiki markup">Wiki</button>
-        </div>
+      <div class="head"><span class="lbl">2 · Clean result</span><button class="btn2" type="button" data-toggle-raw>View raw</button></div>
+      <div class="seg" role="tablist">
+        <button type="button" role="tab" class="on" data-mode="rich">Rich</button>
+        <button type="button" role="tab" data-mode="plain">Plain</button>
+        <button type="button" role="tab" data-mode="markdown">Markdown</button>
+        <button type="button" role="tab" data-mode="jira">Atlassian</button>
       </div>
+      <div class="hint" data-hint>Rich text — for Gmail, Outlook, Notion, Word, Jira Cloud</div>
       <div class="prev" data-preview><p class="muted">Your cleaned content will appear here.</p></div>
       <pre class="raw mono" data-raw hidden></pre>
     </div>
   </div>
   <div class="card bar">
     <span class="muted" data-stats>Paste something to begin.</span>
-    <div class="acts">
-      <button class="btn2" type="button" data-toggle-raw>View raw</button>
-      <button class="btn" type="button" data-copy disabled>Copy clean result</button>
-    </div>
+    <button class="btn" type="button" data-copy disabled>Copy clean result</button>
   </div>
   <div class="strip" data-toast hidden>✓ Copied. Paste with <span class="mono">Ctrl+V</span> — it will land as clean text.</div>
 </div>
@@ -36,15 +32,16 @@ const { source, placeholder = `Ctrl+V / ⌘V your ${source} content…` } = Astr
   .tool{display:flex;flex-direction:column;gap:16px}
   .panes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media (max-width:760px){.panes{grid-template-columns:1fr}}
-  .head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line);background:#FCFBF9;gap:8px;min-height:56px}
-  .lbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2)}
+  .head{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;border-bottom:1px solid var(--line);background:#FCFBF9;gap:8px}
+  .lbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);white-space:nowrap}
   .paste{min-height:300px;max-height:60vh;overflow:auto;padding:20px;outline:none;font-size:15px}
   .paste:focus{box-shadow:inset 0 0 0 2px var(--acc-line)}
   .paste:empty::before{content:attr(data-ph);color:#A39DAB}
-  .seg{display:flex;background:#F1EEE8;border-radius:8px;padding:3px;gap:2px}
-  .seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;padding:5px 12px;border-radius:6px;color:var(--ink2);cursor:pointer}
+  .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;background:#F1EEE8;padding:3px}
+  .seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;padding:7px 4px;border-radius:6px;color:var(--ink2);cursor:pointer;white-space:nowrap}
+  .hint{font-size:12px;color:var(--ink2);padding:8px 16px;border-bottom:1px solid var(--line);background:#FCFBF9}
   .seg .on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-  .prev,.raw{padding:20px;min-height:300px;max-height:60vh;overflow:auto;font-size:15px;margin:0}
+  .prev,.raw{padding:20px;min-height:255px;max-height:60vh;overflow:auto;font-size:15px;margin:0}
   .raw{white-space:pre-wrap;word-break:break-word;font-size:13px;background:#FCFBF9}
   .prev :global(h1),.prev :global(h2),.prev :global(h3){font-size:20px;margin:0 0 8px}
   .prev :global(p){margin:0 0 8px}
@@ -56,7 +53,6 @@ const { source, placeholder = `Ctrl+V / ⌘V your ${source} content…` } = Astr
   .prev.plain{white-space:pre-wrap}
   .bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:12px;flex-wrap:wrap}
   .bar .muted{font-size:14px}
-  .acts{display:flex;gap:10px;align-items:center}
   .strip{background:var(--acc-soft);border:1px solid var(--acc-line);border-radius:10px;padding:10px 14px;font-size:14px}
 </style>
 
@@ -71,6 +67,13 @@ const { source, placeholder = `Ctrl+V / ⌘V your ${source} content…` } = Astr
     const copyBtn = tool.querySelector<HTMLButtonElement>('[data-copy]')!;
     const toast = tool.querySelector<HTMLElement>('[data-toast]')!;
     const toggleRaw = tool.querySelector<HTMLButtonElement>('[data-toggle-raw]')!;
+    const hint = tool.querySelector<HTMLElement>('[data-hint]')!;
+    const hints: Record<Mode, string> = {
+      rich: 'Rich text — for Gmail, Outlook, Notion, Word, Jira Cloud',
+      plain: 'Plain text — for any text box that strips formatting',
+      markdown: 'Markdown — for Slack, GitHub, Obsidian, Discord',
+      jira: 'Jira / Confluence wiki markup — for Jira Server, Data Center and Confluence',
+    };
     let mode: Mode = 'rich';
     let result: CleanResult | null = null;
     let showRaw = false;
@@ -123,6 +126,7 @@ const { source, placeholder = `Ctrl+V / ⌘V your ${source} content…` } = Astr
 
     tool.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach((b) => b.addEventListener('click', () => {
       mode = b.dataset.mode as Mode;
+      hint.textContent = hints[mode];
       tool.querySelectorAll('[data-mode]').forEach((x) => x.classList.toggle('on', x === b));
       render();
     }));
