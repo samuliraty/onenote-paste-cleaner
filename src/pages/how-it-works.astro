@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="How Paste Cleaner works" description="What Paste Cleaner keeps, what it removes, and why it never uploads your content.">
+  <main class="wrap prose" style="padding-top:36px;padding-bottom:64px;max-width:760px">
+    <h1 class="h1 disp" style="margin-bottom:16px">How it works</h1>
+    <p>When you copy from OneNote, Word, Outlook or Google Docs, the clipboard carries two versions of your content: plain text and an HTML document full of application-specific styling. Most destinations either paste the messy HTML or throw everything away.</p>
+    <h2 class="h2 disp">What happens on paste</h2>
+    <ol>
+      <li>The HTML flavour is read from the clipboard and sanitised with DOMPurify.</li>
+      <li>Inline bold, italic and underline styles are converted into real tags; Word-style fake lists become real lists; single-cell wrapper tables are unwrapped.</li>
+      <li>Every style, class, font and colour attribute is removed. Links are kept only if they point to http, https or mailto.</li>
+      <li>The result is rendered as a preview and converted to plain text and Markdown.</li>
+    </ol>
+    <h2 class="h2 disp">What "Copy" writes</h2>
+    <p><strong>Rich</strong> writes both HTML and plain text to the clipboard, so rich editors keep structure and plain fields get text. <strong>Plain</strong> writes text only. <strong>Markdown</strong> writes Markdown as text.</p>
+    <h2 class="h2 disp">Privacy</h2>
+    <p>Everything runs in your browser. There is no backend, no upload and no storage. See the <a href="/privacy/">privacy notice</a> for details on advertising cookies.</p>
+  </main>
+</Base>

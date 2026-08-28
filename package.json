@@ -1,0 +1,30 @@
+{
+  "name": "onenote-paste-cleaner",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.2.9",
+    "dompurify": "^3.4.14",
+    "turndown": "^7.2.4"
+  },
+  "allowScripts": {
+    "esbuild": true
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.0.5",
+    "@types/turndown": "^5.0.6",
+    "jsdom": "^30.0.1",
+    "vitest": "^4.1.11"
+  }
+}

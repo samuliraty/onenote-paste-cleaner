@@ -1,0 +1,19 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  [`Does it handle Word's numbered lists?`, `Yes. Word fakes lists with paragraphs and mso-list styles; these are converted back to real list items.`],
+  [`Are tracked changes kept?`, `Only the accepted text is copied by Word, so what you paste is what you get.`],
+  [`Does my content get uploaded?`, `No. The cleaning runs entirely in your browser; there is no server and nothing is stored.`],
+];
+---
+<ToolPage
+  title="Word Paste Cleaner — paste from Word without the formatting"
+  description="Strip Microsoft Word formatting before pasting into email, CMS, Slack or forms. Clean text, HTML or Markdown, converted in your browser."
+  h1="Copy from Word. Paste anywhere, cleanly."
+  lead="Word wraps every paragraph in MsoNormal classes, font tags and list hacks. Paste below and get clean text, HTML or Markdown."
+  source="Microsoft Word"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">Why Word paste looks broken</h2>
+  <p>Word's clipboard HTML includes conditional comments, Calibri font declarations, and list items faked with symbol characters and mso-list styles. Paste Cleaner rebuilds real lists and drops everything else.</p>
+</ToolPage>

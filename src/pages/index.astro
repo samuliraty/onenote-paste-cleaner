@@ -1,0 +1,22 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  ['Does my content get uploaded?', 'No. The cleaning runs entirely in your browser; there is no server and nothing is stored.'],
+  ['What is kept and what is removed?', 'Kept: headings, paragraphs, bold/italic, lists, links, tables, line breaks. Removed: fonts, colours, highlights, sizes, Office classes, empty spans, images.'],
+  ['Does it work with Word, Outlook and Google Docs?', 'Yes — they produce the same kind of markup. Use the dedicated pages for tips specific to each app.'],
+  ['Which mode should I pick?', 'Rich for email, Notion or Word. Plain for text boxes that strip everything anyway. Markdown for Slack, GitHub, Obsidian or Jira.'],
+];
+---
+<ToolPage
+  title="OneNote Paste Cleaner — copy from OneNote without the formatting"
+  description="Free tool that strips OneNote's Office formatting so you can paste clean text, HTML or Markdown into Gmail, Slack, Notion, Jira and any text box. Runs in your browser."
+  h1="Copy from OneNote. Paste anywhere, without the mess."
+  lead="Paste your OneNote content below. We strip the Office formatting junk and hand you clean text, tidy HTML, or Markdown — ready for Gmail, Slack, Notion, Jira, or a plain text box."
+  source="OneNote"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">Why OneNote paste looks broken</h2>
+  <p>OneNote copies a full HTML document with Calibri font tags, table wrappers, highlight colours and hundreds of <span class="mono">mso-</span> styles. Most apps either keep all of it or reject it. Paste Cleaner keeps the structure that matters — headings, bold, lists, links, tables — and throws away the rest.</p>
+  <div class="pills"><span class="pill">Gmail</span><span class="pill">Slack</span><span class="pill">Notion</span><span class="pill">Jira</span><span class="pill">Teams</span><span class="pill">WordPress</span><span class="pill">Any textarea</span></div>
+</ToolPage>
+<style>.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}</style>

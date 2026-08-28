@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+---
+<Base title="Privacy — Paste Cleaner" description="Privacy notice for paste-cleaner.com.">
+  <main class="wrap prose" style="padding-top:36px;padding-bottom:64px;max-width:760px">
+    <h1 class="h1 disp" style="margin-bottom:16px">Privacy</h1>
+    <p><strong>Your content.</strong> Anything you paste into this site is processed in your browser only. It is never sent to a server, logged or stored.</p>
+    <p><strong>Analytics.</strong> We use Cloudflare Web Analytics, which is cookieless and does not track you across sites.</p>
+    <p><strong>Advertising.</strong> Ads are served by Google AdSense. Google and its partners may use cookies or device identifiers to personalise ads, subject to your consent where required by law. You can change your choice at any time via the consent banner, and read more at <a href="https://policies.google.com/technologies/ads" rel="noopener">Google's advertising policy</a>.</p>
+    <p><strong>Contact.</strong> <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a></p>
+  </main>
+</Base>

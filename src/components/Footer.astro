@@ -1,0 +1,12 @@
+---
+import { site } from '../config/site';
+---
+<footer class="foot"><div class="wrap row">
+  <span>© {new Date().getFullYear()} {site.domain} · Not affiliated with Microsoft or Google.</span>
+  <span class="links"><a href="/privacy/">Privacy</a><a href={`mailto:${site.contactEmail}`}>Contact</a></span>
+</div></footer>
+<style>
+  .foot{border-top:1px solid var(--line);padding:32px 0 80px;font-size:14px;color:var(--ink2)}
+  .row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  .links{display:flex;gap:16px}
+</style>

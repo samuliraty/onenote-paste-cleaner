@@ -1,0 +1,145 @@
+---
+interface Props { source: string; placeholder?: string }
+const { source, placeholder = `Ctrl+V / ⌘V your ${source} content…` } = Astro.props;
+---
+<div class="tool" data-tool>
+  <div class="panes">
+    <div class="card">
+      <div class="head"><span class="lbl">1 · Paste here</span><button class="btn2" data-clear type="button">Clear</button></div>
+      <div class="paste" contenteditable="true" data-input data-ph={placeholder} aria-label="Paste area"></div>
+    </div>
+    <div class="card">
+      <div class="head">
+        <span class="lbl">2 · Clean result</span>
+        <div class="seg" role="tablist">
+          <button type="button" role="tab" class="on" data-mode="rich">Rich</button>
+          <button type="button" role="tab" data-mode="plain">Plain</button>
+          <button type="button" role="tab" data-mode="markdown">Markdown</button>
+        </div>
+      </div>
+      <div class="prev" data-preview><p class="muted">Your cleaned content will appear here.</p></div>
+      <pre class="raw mono" data-raw hidden></pre>
+    </div>
+  </div>
+  <div class="card bar">
+    <span class="muted" data-stats>Paste something to begin.</span>
+    <div class="acts">
+      <button class="btn2" type="button" data-toggle-raw>View raw</button>
+      <button class="btn" type="button" data-copy disabled>Copy clean result</button>
+    </div>
+  </div>
+  <div class="strip" data-toast hidden>✓ Copied. Paste with <span class="mono">Ctrl+V</span> — it will land as clean text.</div>
+</div>
+
+<style>
+  .tool{display:flex;flex-direction:column;gap:16px}
+  .panes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:760px){.panes{grid-template-columns:1fr}}
+  .head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line);background:#FCFBF9;gap:8px;min-height:56px}
+  .lbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2)}
+  .paste{min-height:300px;max-height:60vh;overflow:auto;padding:20px;outline:none;font-size:15px}
+  .paste:focus{box-shadow:inset 0 0 0 2px var(--acc-line)}
+  .paste:empty::before{content:attr(data-ph);color:#A39DAB}
+  .seg{display:flex;background:#F1EEE8;border-radius:8px;padding:3px;gap:2px}
+  .seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;padding:5px 12px;border-radius:6px;color:var(--ink2);cursor:pointer}
+  .seg .on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .prev,.raw{padding:20px;min-height:300px;max-height:60vh;overflow:auto;font-size:15px;margin:0}
+  .raw{white-space:pre-wrap;word-break:break-word;font-size:13px;background:#FCFBF9}
+  .prev :global(h1),.prev :global(h2),.prev :global(h3){font-size:20px;margin:0 0 8px}
+  .prev :global(p){margin:0 0 8px}
+  .prev :global(ul),.prev :global(ol){margin:8px 0;padding-left:22px}
+  .prev :global(table){border-collapse:collapse;margin:10px 0;font-size:14px}
+  .prev :global(td),.prev :global(th){border:1px solid var(--line);padding:5px 10px;text-align:left}
+  .prev :global(a){color:var(--acc);text-decoration:underline}
+  .prev :global(blockquote){margin:8px 0;padding-left:12px;border-left:3px solid var(--line);color:var(--ink2)}
+  .prev.plain{white-space:pre-wrap}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:12px;flex-wrap:wrap}
+  .bar .muted{font-size:14px}
+  .acts{display:flex;gap:10px;align-items:center}
+  .strip{background:var(--acc-soft);border:1px solid var(--acc-line);border-radius:10px;padding:10px 14px;font-size:14px}
+</style>
+
+<script>
+  import { clean, copyResult, type CleanResult, type Mode } from '../lib/clean';
+
+  document.querySelectorAll<HTMLElement>('[data-tool]').forEach((tool) => {
+    const input = tool.querySelector<HTMLElement>('[data-input]')!;
+    const preview = tool.querySelector<HTMLElement>('[data-preview]')!;
+    const raw = tool.querySelector<HTMLElement>('[data-raw]')!;
+    const stats = tool.querySelector<HTMLElement>('[data-stats]')!;
+    const copyBtn = tool.querySelector<HTMLButtonElement>('[data-copy]')!;
+    const toast = tool.querySelector<HTMLElement>('[data-toast]')!;
+    const toggleRaw = tool.querySelector<HTMLButtonElement>('[data-toggle-raw]')!;
+    let mode: Mode = 'rich';
+    let result: CleanResult | null = null;
+    let showRaw = false;
+    let lastHtml = '';
+
+    const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+    function render() {
+      preview.classList.toggle('plain', mode !== 'rich');
+      if (!result) return;
+      if (mode === 'rich') preview.innerHTML = result.html || '<p class="muted">Nothing to show.</p>';
+      else preview.textContent = mode === 'plain' ? result.text : result.markdown;
+      raw.textContent = mode === 'rich' ? result.html : mode === 'plain' ? result.text : result.markdown;
+      preview.hidden = showRaw;
+      raw.hidden = !showRaw;
+      const s = result.stats;
+      stats.innerHTML = `Removed <strong>${s.stylesRemoved} style tags</strong>, ${s.fontsRemoved} font${s.fontsRemoved === 1 ? '' : 's'}, ${s.colorsRemoved} colour${s.colorsRemoved === 1 ? '' : 's'} · ${s.chars} chars`;
+      copyBtn.disabled = !result.text;
+    }
+
+    function process(html: string, text: string) {
+      lastHtml = html;
+      result = clean(html, text);
+      toast.hidden = true;
+      render();
+    }
+
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const html = e.clipboardData?.getData('text/html') || '';
+      const text = e.clipboardData?.getData('text/plain') || '';
+      input.innerHTML = html ? html : `<pre style="white-space:pre-wrap;font:inherit">${escape(text)}</pre>`;
+      process(html, text);
+    });
+    input.addEventListener('input', () => {
+      if (input.innerHTML !== lastHtml) process(input.innerHTML, input.innerText);
+    });
+
+    tool.querySelector('[data-clear]')!.addEventListener('click', () => {
+      input.innerHTML = '';
+      result = null;
+      preview.innerHTML = '<p class="muted">Your cleaned content will appear here.</p>';
+      raw.textContent = '';
+      stats.textContent = 'Paste something to begin.';
+      copyBtn.disabled = true;
+      toast.hidden = true;
+      input.focus();
+    });
+
+    tool.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach((b) => b.addEventListener('click', () => {
+      mode = b.dataset.mode as Mode;
+      tool.querySelectorAll('[data-mode]').forEach((x) => x.classList.toggle('on', x === b));
+      render();
+    }));
+
+    toggleRaw.addEventListener('click', () => {
+      showRaw = !showRaw;
+      toggleRaw.textContent = showRaw ? 'View preview' : 'View raw';
+      preview.hidden = showRaw && !!result;
+      raw.hidden = !showRaw;
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      if (!result) return;
+      try {
+        await copyResult(result, mode);
+        toast.hidden = false;
+      } catch {
+        stats.textContent = 'Clipboard blocked by the browser — select the result and copy manually.';
+      }
+    });
+  });
+</script>

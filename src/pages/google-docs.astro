@@ -1,0 +1,19 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  [`Is bold text kept?`, `Yes. Google Docs expresses bold as font-weight:700 on spans; that is converted to a real strong tag.`],
+  [`What about comments and suggestions?`, `They are not part of the clipboard content, so they never appear.`],
+  [`Does my content get uploaded?`, `No. The cleaning runs entirely in your browser; there is no server and nothing is stored.`],
+];
+---
+<ToolPage
+  title="Google Docs Paste Cleaner — paste from Docs without styles"
+  description="Strip Google Docs inline styles before pasting into email, forms, Slack or Markdown editors. Free, browser-only."
+  h1="Copy from Google Docs. Paste clean."
+  lead="Google Docs copies every span with inline font, colour and size. Paste below to get semantic text without the styles."
+  source="Google Docs"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">Why Google Docs paste looks broken</h2>
+  <p>Google Docs marks bold and italic with inline styles instead of tags, so plain sanitisers lose them. Paste Cleaner converts those styles back into strong and em, then removes the rest.</p>
+</ToolPage>

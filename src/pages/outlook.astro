@@ -1,0 +1,19 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  [`Are email signatures removed?`, `Not automatically — delete them in the paste box before copying.`],
+  [`Do links survive?`, `Yes, http, https and mailto links are kept; Outlook's safelinks wrappers are kept as-is.`],
+  [`Does my content get uploaded?`, `No. The cleaning runs entirely in your browser; there is no server and nothing is stored.`],
+];
+---
+<ToolPage
+  title="Outlook Paste Cleaner — clean formatting from Outlook emails"
+  description="Remove Outlook and Exchange email formatting before pasting into tickets, chat or documents. Runs locally in your browser."
+  h1="Copy from Outlook. Paste without the email junk."
+  lead="Outlook emails carry the full Word rendering engine's markup plus nested quote tables. Paste below to get the plain content."
+  source="Outlook"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">Why Outlook paste looks broken</h2>
+  <p>Outlook uses the Word rendering engine, so copied email bodies include MsoNormal paragraphs, signature tables and nested blockquote tables. Paste Cleaner unwraps single-cell tables and keeps the text, lists and links.</p>
+</ToolPage>

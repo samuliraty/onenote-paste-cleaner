@@ -1,0 +1,23 @@
+---
+import { site } from '../config/site';
+const links = [['/', 'OneNote'], ['/word/', 'Word'], ['/outlook/', 'Outlook'], ['/google-docs/', 'Google Docs'], ['/how-it-works/', 'How it works']];
+const path = Astro.url.pathname;
+---
+<header class="wrap hdr">
+  <a href="/" class="brand">
+    <span class="logo"></span>
+    <span class="disp">{site.name}</span>
+  </a>
+  <nav>
+    {links.map(([href, label]) => <a href={href} aria-current={path === href ? 'page' : undefined}>{label}</a>)}
+  </nav>
+</header>
+<style>
+  .hdr{display:flex;align-items:center;justify-content:space-between;padding-top:20px;padding-bottom:20px;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px;color:var(--ink);font-size:19px;font-weight:700}
+  .brand:hover{text-decoration:none}
+  .logo{width:28px;height:28px;background:var(--acc);border-radius:7px}
+  nav{display:flex;gap:24px;flex-wrap:wrap}
+  nav a{color:var(--ink);font-weight:500;font-size:14px}
+  nav a[aria-current]{color:var(--acc)}
+</style>
