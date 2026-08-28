@@ -145,6 +145,14 @@ function stripAttributes(root: HTMLElement) {
 }
 
 function collapse(root: HTMLElement) {
+  root.querySelectorAll('ul > ul, ul > ol, ol > ul, ol > ol').forEach((list) => {
+    let prev = list.previousElementSibling;
+    if (!prev || prev.tagName !== 'LI') {
+      prev = list.ownerDocument.createElement('li');
+      list.before(prev);
+    }
+    prev.appendChild(list);
+  });
   root.querySelectorAll('strong, em, u, s, a').forEach((el) => {
     if (el.querySelector('p, div, ul, ol, li, table, h1, h2, h3, h4, h5, h6, blockquote')) unwrap(el);
   });

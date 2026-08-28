@@ -68,6 +68,13 @@ describe('clean', () => {
     expect(r.text).toBe('line one\nline two\n\npara two');
   });
 
+  it('fixes lists nested directly inside lists', () => {
+    const r = clean('<ul><li>Parent</li><ul><li>Child</li><ul><li>Grandchild</li></ul></ul><li>Sibling</li></ul>', '');
+    expect(r.html).toBe('<ul><li>Parent<ul><li>Child<ul><li>Grandchild</li></ul></li></ul></li><li>Sibling</li></ul>');
+    expect(r.markdown).toBe('- Parent\n  - Child\n    - Grandchild\n- Sibling');
+    expect(r.text).toBe('- Parent\n  - Child\n    - Grandchild\n- Sibling');
+  });
+
   it('renders tables as markdown tables', () => {
     const r = clean('<table><tr><td>a</td><td>b</td></tr><tr><td>1</td><td>2</td></tr></table>', '');
     expect(r.markdown).toBe('| a | b |\n| --- | --- |\n| 1 | 2 |');
