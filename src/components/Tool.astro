@@ -15,6 +15,7 @@ const { source, placeholder = `Ctrl+V / ⌘V your ${source} content…` } = Astr
           <button type="button" role="tab" class="on" data-mode="rich">Rich</button>
           <button type="button" role="tab" data-mode="plain">Plain</button>
           <button type="button" role="tab" data-mode="markdown">Markdown</button>
+          <button type="button" role="tab" data-mode="jira">Jira</button>
         </div>
       </div>
       <div class="prev" data-preview><p class="muted">Your cleaned content will appear here.</p></div>
@@ -75,14 +76,15 @@ const { source, placeholder = `Ctrl+V / ⌘V your ${source} content…` } = Astr
     let showRaw = false;
     let lastHtml = '';
 
+    const textFor = (m: Mode) => (m === 'plain' ? result!.text : m === 'markdown' ? result!.markdown : result!.jira);
     const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
     function render() {
       preview.classList.toggle('plain', mode !== 'rich');
       if (!result) return;
       if (mode === 'rich') preview.innerHTML = result.html || '<p class="muted">Nothing to show.</p>';
-      else preview.textContent = mode === 'plain' ? result.text : result.markdown;
-      raw.textContent = mode === 'rich' ? result.html : mode === 'plain' ? result.text : result.markdown;
+      else preview.textContent = textFor(mode);
+      raw.textContent = mode === 'rich' ? result.html : textFor(mode);
       preview.hidden = showRaw;
       raw.hidden = !showRaw;
       const s = result.stats;

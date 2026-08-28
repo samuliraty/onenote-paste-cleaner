@@ -75,6 +75,11 @@ describe('clean', () => {
     expect(r.text).toBe('- Parent\n  - Child\n    - Grandchild\n- Sibling');
   });
 
+  it('emits Jira wiki markup', () => {
+    const r = clean('<h2>Title</h2><p>Hi <strong>bold</strong> <a href="https://x.io">link</a></p><ul><li>Parent<ul><li>Child</li></ul></li><li>Sib</li></ul><ol><li>One</li></ol><table><tr><td>a</td><td>b</td></tr><tr><td>1</td><td>2</td></tr></table>', '');
+    expect(r.jira).toBe('h2. Title\n\nHi *bold* [link|https://x.io]\n\n* Parent\n** Child\n* Sib\n\n# One\n\n||a||b||\n|1|2|');
+  });
+
   it('renders tables as markdown tables', () => {
     const r = clean('<table><tr><td>a</td><td>b</td></tr><tr><td>1</td><td>2</td></tr></table>', '');
     expect(r.markdown).toBe('| a | b |\n| --- | --- |\n| 1 | 2 |');

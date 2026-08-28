@@ -1,12 +1,13 @@
 import DOMPurify from 'dompurify';
 import TurndownService from 'turndown';
 
-export type Mode = 'rich' | 'plain' | 'markdown';
+export type Mode = 'rich' | 'plain' | 'markdown' | 'jira';
 
 export interface CleanResult {
   html: string;
   text: string;
   markdown: string;
+  jira: string;
   stats: { stylesRemoved: number; fontsRemoved: number; colorsRemoved: number; chars: number };
 }
 
@@ -232,6 +233,59 @@ function toText(root: HTMLElement): string {
   return out.join('').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').replace(/^\s+|\s+$/g, '');
 }
 
+function toJira(root: HTMLElement): string {
+  const inline = (n: Node): string => {
+    if (n.nodeType === 3) return n.textContent!.replace(/\s+/g, ' ');
+    if (n.nodeType !== 1) return '';
+    const el = n as Element;
+    const inner = () => Array.from(el.childNodes).map(inline).join('');
+    switch (el.tagName) {
+      case 'STRONG': return `*${inner().trim()}*`;
+      case 'EM': return `_${inner().trim()}_`;
+      case 'U': return `+${inner().trim()}+`;
+      case 'S': return `-${inner().trim()}-`;
+      case 'CODE': return `{{${inner()}}}`;
+      case 'A': return `[${inner().trim()}|${el.getAttribute('href')}]`;
+      case 'BR': return '\n';
+      default: return inner();
+    }
+  };
+  const out: string[] = [];
+  const block = (n: Node, marks: string) => {
+    if (n.nodeType !== 1) { const t = inline(n).trim(); if (t) out.push(t + '\n\n'); return; }
+    const el = n as Element;
+    const tag = el.tagName;
+    if (/^H[1-6]$/.test(tag)) { out.push(`h${tag[1]}. ${inline(el).trim()}\n\n`); return; }
+    if (tag === 'UL' || tag === 'OL') {
+      const mark = marks + (tag === 'OL' ? '#' : '*');
+      Array.from(el.children).forEach((li) => {
+        const text = Array.from(li.childNodes).filter((c) => !(c.nodeType === 1 && ['UL', 'OL'].includes((c as Element).tagName))).map(inline).join('').trim();
+        out.push(`${mark} ${text}\n`);
+        Array.from(li.children).filter((c) => ['UL', 'OL'].includes(c.tagName)).forEach((sub) => block(sub, mark));
+      });
+      if (!marks) out.push('\n');
+      return;
+    }
+    if (tag === 'TABLE') {
+      const rows = Array.from(el.querySelectorAll('tr'));
+      rows.forEach((tr, i) => {
+        const cells = Array.from(tr.children).map((c) => inline(c).trim() || ' ');
+        const sep = i === 0 ? '||' : '|';
+        out.push(sep + cells.join(sep) + sep + '\n');
+      });
+      out.push('\n');
+      return;
+    }
+    if (tag === 'BLOCKQUOTE') { out.push(`bq. ${inline(el).trim()}\n\n`); return; }
+    if (tag === 'PRE') { out.push(`{code}\n${el.textContent}\n{code}\n\n`); return; }
+    if (tag === 'HR') { out.push('----\n\n'); return; }
+    const t = inline(el).trim();
+    if (t) out.push(t + '\n\n');
+  };
+  root.childNodes.forEach((n) => block(n, ''));
+  return out.join('').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 const turndown = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-', codeBlockStyle: 'fenced' });
 turndown.addRule('table', {
   filter: 'table',
@@ -251,7 +305,7 @@ export function clean(rawHtml: string, rawText: string): CleanResult {
   if (!rawHtml.trim()) {
     const text = rawText.trim();
     const html = text.split(/\n{2,}/).map((p) => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`).join('');
-    return { html, text, markdown: text, stats: { ...stats, chars: text.length } };
+    return { html, text, markdown: text, jira: text, stats: { ...stats, chars: text.length } };
   }
   const sanitized = DOMPurify.sanitize(rawHtml, { ALLOWED_TAGS: [...ALLOWED_TAGS, 'font', 'o:p'], ALLOWED_ATTR: [...ALLOWED_ATTR, 'style', 'class'], WHOLE_DOCUMENT: false });
   const root = document.createElement('div');
@@ -264,7 +318,8 @@ export function clean(rawHtml: string, rawText: string): CleanResult {
   const html = root.innerHTML.replace(/ /g, ' ').replace(/>\s+</g, '><').trim();
   const text = toText(root);
   const markdown = turndown.turndown(html).replace(/^( *)([-*]|\d+\.)[ \t]{2,}/gm, (_m, sp: string, mk: string) => ' '.repeat(sp.length / 2) + mk + ' ').trim();
-  return { html, text, markdown, stats: { ...stats, chars: text.length } };
+  const jira = toJira(root);
+  return { html, text, markdown, jira, stats: { ...stats, chars: text.length } };
 }
 
 function escapeHtml(s: string) {
@@ -280,5 +335,5 @@ export async function copyResult(result: CleanResult, mode: Mode): Promise<void>
     await navigator.clipboard.write([item]);
     return;
   }
-  await navigator.clipboard.writeText(mode === 'markdown' ? result.markdown : result.text);
+  await navigator.clipboard.writeText(mode === 'markdown' ? result.markdown : mode === 'jira' ? result.jira : result.text);
 }
