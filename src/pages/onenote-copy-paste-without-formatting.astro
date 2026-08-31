@@ -1,0 +1,23 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  [`Isn't Ctrl+Shift+V enough?`, `Paste-without-formatting strips everything — including bold, links, lists and tables. This tool keeps the structure you want and removes only the styling junk.`],
+  [`What exactly gets removed?`, `Fonts, sizes, colours, highlights, Office classes and styles, empty spans, layout tables and images. Kept: headings, paragraphs, bold, italic, underline, lists with nesting, links and tables.`],
+  [`Does this work for Word, Outlook and Google Docs too?`, `Yes — they produce the same kind of markup. There are dedicated pages for each with app-specific tips.`],
+  [`Does my content get uploaded?`, `No. The cleaning runs entirely in your browser; there is no server and nothing is stored.`],
+];
+---
+<ToolPage
+  title="Copy and paste from OneNote without formatting — but keep the structure"
+  description="Ctrl+Shift+V strips everything, pasting normally keeps the mess. This free tool removes OneNote's fonts, colours and Office styles but keeps bold, links, lists and tables."
+  h1="Paste from OneNote without the formatting — but keep bold, links and lists."
+  lead="The middle ground between pasting the mess and pasting dead plain text: paste below, and copy a version with the Office styling gone but the structure intact."
+  source="OneNote"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">The problem with the two usual options</h2>
+  <p>When OneNote content lands somewhere it doesn't belong, most people reach for one of two fixes. <strong>Paste normally</strong> and you carry the whole Office payload: Calibri on everything, highlight colours, odd spacing, hundreds of <span class="mono">mso-</span> styles that fight the destination's own formatting. <strong>Paste without formatting</strong> (Ctrl+Shift+V, or "Keep text only") and you throw out the baby with the bathwater: links become dead text, bold disappears, lists lose their bullets and nesting, tables collapse into lines.</p>
+  <h2 class="h2 disp">The middle ground</h2>
+  <p>This tool splits the difference. It parses what OneNote put on your clipboard, keeps the semantic structure — headings, bold and italic, underline, links, nested lists, tables — and deletes everything presentational: font families and sizes, text and highlight colours, margins, Office classes, empty wrapper elements, images. The result pastes like native content wherever it lands, in your destination's own font and style.</p>
+  <p>It also fixes the cases plain pasting can't: Office's fake lists become real lists (<a href="/onenote-paste-lists/">details here</a>), layout tables get unwrapped (<a href="/onenote-paste-table/">tables guide</a>), and for Jira and Confluence wiki-markup fields there's a dedicated <a href="/jira/">Atlassian output</a>.</p>
+</ToolPage>

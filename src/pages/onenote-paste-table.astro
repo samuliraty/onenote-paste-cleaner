@@ -1,0 +1,23 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  [`Why does my OneNote table paste as one column or a mess?`, `OneNote wraps its content in layout tables and fills cells with styled paragraphs. Many apps misread that as nested content. The cleaner unwraps layout tables and keeps only real data tables.`],
+  [`Can I paste an OneNote table into Excel or Google Sheets?`, `Yes — use Plain mode. Cells are separated with tabs and rows with line breaks, which spreadsheets split into columns and rows automatically.`],
+  [`How do I get a table into Jira or Confluence?`, `Use Atlassian mode — it writes ||header|| and |cell| wiki-markup rows.`],
+  [`Does my content get uploaded?`, `No. The cleaning runs entirely in your browser; there is no server and nothing is stored.`],
+];
+---
+<ToolPage
+  title="OneNote table won't paste right? Clean it for Excel, email or Jira"
+  description="OneNote tables paste as a mess of styled cells or one column. Paste here to get a clean table for email and Notion, tab-separated cells for Excel and Sheets, or Jira wiki markup."
+  h1="Paste OneNote tables into Excel, email or Jira — cleanly."
+  lead="Paste a OneNote table below. You get a clean table for rich editors, tab-separated text that Excel and Google Sheets split into cells, a Markdown table, or Jira wiki-markup rows."
+  source="OneNote"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">Why OneNote tables paste badly</h2>
+  <p>Two reasons. First, OneNote uses tables for page layout: the whole content of a page section is often wrapped in an invisible single-cell table, so the destination receives a table it never sees. Second, every cell of a real table contains fully styled paragraphs — font tags, colours, margins — which some editors render as nested blocks instead of cell text.</p>
+  <p>The cleaner unwraps single-cell layout tables, flattens each cell to its text content with inline formatting kept, and drops the styling. What's left is a plain <span class="mono">&lt;table&gt;</span> with rows and cells — the structure every destination can handle.</p>
+  <h2 class="h2 disp">Pick the output by destination</h2>
+  <p><strong>Excel / Google Sheets:</strong> Plain mode. Cells become tab-separated, rows become lines; paste into a spreadsheet and it fills the grid. <strong>Gmail, Outlook, Notion, Word:</strong> Rich mode keeps a real table. <strong>GitHub, Slack posts, Obsidian:</strong> Markdown mode writes a pipe table. <strong>Jira Server / Confluence:</strong> Atlassian mode writes <span class="mono">||header||</span> and <span class="mono">|cell|</span> rows.</p>
+</ToolPage>

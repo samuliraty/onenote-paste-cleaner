@@ -1,0 +1,25 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  [`Why do my OneNote bullets paste as plain paragraphs?`, `OneNote marks list items with internal mso-list styles instead of standard list tags. Apps that don't understand Office markup see plain paragraphs. This tool converts them back into real lists before you paste.`],
+  [`Why does nesting disappear?`, `Indent levels live in those same mso-list styles and margin values, not in the list structure. The cleaner reads the level of every item and rebuilds properly nested lists.`],
+  [`How do I paste a nested list into Jira or Confluence?`, `Use the Atlassian mode — wiki-markup fields ignore indentation and need * / ** prefixes instead.`],
+  [`Does my content get uploaded?`, `No. The cleaning runs entirely in your browser; there is no server and nothing is stored.`],
+];
+---
+<ToolPage
+  title="OneNote lists paste broken or flat? Fix bullets and nesting"
+  description="OneNote bullet and numbered lists paste as flat paragraphs or lose their nesting. Paste them here to get real nested lists as rich text, Markdown or Jira wiki markup."
+  h1="OneNote lists paste flat? Get the nesting back."
+  lead="Paste your OneNote list below. Bullets, numbering and every indent level are rebuilt into a real list you can paste into Gmail, Notion, Word, Slack, Jira or Confluence."
+  source="OneNote"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">Why OneNote lists break when you paste them</h2>
+  <p>OneNote doesn't copy lists as standard HTML lists. Each bullet is a separate paragraph carrying an <span class="mono">mso-list</span> style, with the bullet character itself embedded as a Symbol-font span and the indent level hidden in a margin value. That's an internal Microsoft format:</p>
+  <p>Paste it into an app that understands Office markup (Word, Outlook) and it looks fine. Paste it anywhere else and one of two things happens: the app keeps the raw paragraphs — so you get flat lines with stray bullet characters — or it strips everything and you get an unindented wall of text. Nesting is the first casualty, because the level information isn't in the structure at all.</p>
+  <h2 class="h2 disp">What this tool does with your list</h2>
+  <p>The cleaner reads the level of every item — from the <span class="mono">mso-list level</span> marker, or the indent width when that's missing — removes the fake bullet characters, detects whether the list is bulleted or numbered, and rebuilds a real nested list. You then copy it in the format the destination understands: rich text for editors like Gmail and Notion, Markdown with two-space indents for Slack and GitHub, or <span class="mono">* / **</span> wiki markup for Jira Server and Confluence.</p>
+  <h2 class="h2 disp">Three destinations that need different output</h2>
+  <p><strong>Gmail, Notion, Word, Teams:</strong> use Rich — they accept the rebuilt HTML list directly. <strong>Slack, GitHub, Obsidian:</strong> use Markdown — nesting is expressed as two-space indentation. <strong>Jira Server / Data Center and Confluence:</strong> use Atlassian — those fields ignore indentation entirely and flatten anything that isn't <span class="mono">* item</span> / <span class="mono">** nested item</span> syntax.</p>
+</ToolPage>
