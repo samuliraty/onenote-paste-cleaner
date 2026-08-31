@@ -26,6 +26,7 @@ h1,h2,h3{text-wrap:pretty}
 .prose ol,.prose ul{color:var(--ink2);max-width:640px}
 .ad{background:repeating-linear-gradient(135deg,#EFEBE4 0 8px,#F6F3EE 8px 16px);border:1px dashed #CFC8BC;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A8391;text-transform:uppercase;letter-spacing:.08em;overflow:hidden}
 .ad.live{background:none;border:0;border-radius:0}
+.grid.solo{grid-template-columns:minmax(0,1fr)}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;padding-top:28px;padding-bottom:56px;align-items:start}
 .side{position:sticky;top:24px}
 @media (max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}.side{display:none}}
