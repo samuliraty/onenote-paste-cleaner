@@ -1,5 +1,6 @@
 import DOMPurify from 'dompurify';
 import TurndownService from 'turndown';
+import { marked } from 'marked';
 
 export type Mode = 'rich' | 'plain' | 'markdown' | 'jira';
 
@@ -300,7 +301,16 @@ turndown.addRule('table', {
   },
 });
 
+function looksLikeMarkdown(text: string): boolean {
+  const lines = text.split('\n');
+  const hits = lines.filter((l) => /^\s*(#{1,6} |[-*+] |\d+\. |> |```)/.test(l)).length;
+  return hits >= 2 || /\*\*[^*\n]+\*\*|\[[^\]\n]+\]\([^)\n]+\)/.test(text);
+}
+
 export function clean(rawHtml: string, rawText: string): CleanResult {
+  if (!rawHtml.trim() && looksLikeMarkdown(rawText)) {
+    rawHtml = marked.parse(rawText, { async: false, gfm: true }) as string;
+  }
   const stats = countStats(rawHtml);
   if (!rawHtml.trim()) {
     const text = rawText.trim();

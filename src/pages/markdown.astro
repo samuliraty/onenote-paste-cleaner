@@ -1,0 +1,22 @@
+---
+import ToolPage from '../components/ToolPage.astro';
+const faqs: [string, string][] = [
+  [`How do I paste ChatGPT output into Jira or Confluence?`, `Copy the answer, paste it here, choose Atlassian and copy. Jira Cloud's editor also accepts the Rich output directly. Raw markdown pasted straight into a wiki-markup field renders as asterisks and hashes.`],
+  [`Does it accept raw Markdown text?`, `Yes. If you paste plain text that looks like Markdown — headings, lists, bold, links, code fences — it is parsed first, then converted to whichever output you pick.`],
+  [`How do I get LLM output into Word or Gmail without the hashes?`, `Paste it here and copy in Rich mode: headings, bold, lists and links become real formatting instead of Markdown symbols.`],
+  [`Does my content get uploaded?`, `No. The conversion runs entirely in your browser; there is no server and nothing is stored.`],
+];
+---
+<ToolPage
+  title="Paste ChatGPT / LLM Markdown into Jira, Word or Gmail"
+  description="LLMs answer in Markdown; Jira, Confluence, Word and Gmail don't speak it. Paste ChatGPT or Claude output here and copy it as rich text, plain text or Jira wiki markup."
+  h1="LLM output is Markdown. Your tools aren't."
+  lead="Paste a ChatGPT or Claude answer below — rendered or raw Markdown, either works. Copy it as rich text for Word, Gmail and Notion, as Atlassian wiki markup for Jira and Confluence, or as clean plain text."
+  source="ChatGPT or Markdown"
+  faqs={faqs}
+>
+  <h2 class="h2 disp">Why LLM answers paste badly</h2>
+  <p>Chat assistants write Markdown: <span class="mono">## headings</span>, <span class="mono">**bold**</span>, <span class="mono">- lists</span>, <span class="mono">[links](url)</span>. Copy an answer from the chat window and you get rendered HTML with the assistant's styling baked in; copy from a code block or an API and you get the raw symbols. Neither lands well — Word and Gmail show literal asterisks, Jira's wiki-markup fields flatten the structure, and pasted chat styling clashes with your document.</p>
+  <h2 class="h2 disp">What this does</h2>
+  <p>Both forms are handled. Rendered answers get the styling stripped down to clean structure, and raw Markdown is parsed — headings, bold and italic, links, nested lists, tables, code blocks. Then you pick the destination's language: <strong>Rich</strong> for Word, Gmail, Outlook, Notion and Jira Cloud; <strong>Atlassian</strong> for Jira Server, Data Center and Confluence wiki markup; <strong>Plain</strong> when you want no formatting at all; or <strong>Markdown</strong> to normalise messy Markdown back to a clean standard form.</p>
+</ToolPage>

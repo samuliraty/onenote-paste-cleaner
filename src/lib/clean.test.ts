@@ -80,6 +80,17 @@ describe('clean', () => {
     expect(r.jira).toBe('h2. Title\n\nHi *bold* [link|https://x.io]\n\n* Parent\n** Child\n* Sib\n\n# One\n\n||a||b||\n|1|2|');
   });
 
+  it('parses raw markdown pasted as plain text', () => {
+    const r = clean('', '# Title\n\nSome **bold** and a [link](https://x.io).\n\n- Parent\n  - Child\n\n1. One');
+    expect(r.html).toBe('<h1>Title</h1><p>Some <strong>bold</strong> and a <a href="https://x.io">link</a>.</p><ul><li>Parent<ul><li>Child</li></ul></li></ul><ol><li>One</li></ol>');
+    expect(r.jira).toBe('h1. Title\n\nSome *bold* and a [link|https://x.io].\n\n* Parent\n** Child\n\n# One');
+  });
+
+  it('does not treat ordinary prose as markdown', () => {
+    const r = clean('', 'Just two lines\nof plain text');
+    expect(r.html).toBe('<p>Just two lines<br>of plain text</p>');
+  });
+
   it('renders tables as markdown tables', () => {
     const r = clean('<table><tr><td>a</td><td>b</td></tr><tr><td>1</td><td>2</td></tr></table>', '');
     expect(r.markdown).toBe('| a | b |\n| --- | --- |\n| 1 | 2 |');
